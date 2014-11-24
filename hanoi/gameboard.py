@@ -1,5 +1,5 @@
 import pygame
-from pygame.surface import Surface
+
 from pillar import Pillar
 from ring import Ring
 
@@ -16,7 +16,7 @@ PILLAR_WIDTH = 15
 RING_LARGE_WIDTH = PILLAR_WIDTH * LARGE_BLOCKS;
 RING_MEDIUM_WIDTH = PILLAR_WIDTH * MEDIUM_BLOCKS;
 RING_SMALL_WIDTH = PILLAR_WIDTH * SMALL_BLOCKS;
-RING_HEIGHT = 50;
+RING_HEIGHT = 30;
 RING_BLOCK_WIDTH = 50;
 
 class Base(object): 
@@ -38,22 +38,38 @@ class Base(object):
         self.setPillarSpacing("middle");
         self.setPillarSpacing("right");
         
+        self.setupFont("left");
+        self.setupFont("middle");
+        self.setupFont("right");
      
         
     def setPillarSpacing(self, name):
         
-        pillar = self.pillar[name];
+        pillar = self.pillars[name];
         interval_spacing = self.surface_width / 3;
         mid_spacing = interval_spacing / 2;
         column = pillar.column;
         
-        total_spacing = interval_spacing * column + mid_spacing - PILLAR_WIDTH/2;
+        total_spacing = interval_spacing * (column-1) + mid_spacing - PILLAR_WIDTH/2;
+        print name + str(total_spacing)
+        
         pillar.setPillarX(total_spacing);    
         
         
+    def setupFont(self, name):
+        font = pygame.font.Font(None, 36);
+        text = font.render(self.pillars[name].label, 1, (10, 10, 10));
+        self.pillars[name].setFont(text);
+            
     def draw_base(self):
         #Rect(left, top, width, height)
         pygame.draw.rect(self.surface, BLACK, (0, self.base_y, self.surface_width, 10))
+        
+        
+        
+        #font = pygame.font.Font(None, 36)
+        #text = font.render("A", 1, (10, 10, 10))
+        #self.surface.blit(text, (100, 100))
         
         
     def draw_pillar(self, name):
@@ -62,38 +78,49 @@ class Base(object):
         
         self.draw_rings_in_pillar(name);
         
-    def draw_rings_in_pillar(self, name):
+        self.surface.blit(self.pillars[name].text, 
+                          (self.pillars[name].x, self.base_y + 20));
         
-        num_rings = len(self.pillars[name].rings)
-        for ring in num_rings:
-            height = (ring+1) * RING_HEIGHT
+    def draw_rings_in_pillar(self, name):
+
+        i = 1;
+        padding = 5;
+        for ring in reversed(self.pillars[name].rings):
+            width = RING_BLOCK_WIDTH * ring.ringSize
+            x = self.pillars[name].x - (width - PILLAR_WIDTH)/2
+            y = self.base_y - i *(RING_HEIGHT+padding)
             
+            i += 1
             pygame.draw.rect(self.surface, RED, 
-                             (self.pillars[name].x, 
-                              self.basey-PILLAR_HEIGHT-height,
-                              RING_BLOCK_WIDTH*5,
+                             (x, 
+                              y,
+                              RING_BLOCK_WIDTH*ring.ringSize,
                               RING_HEIGHT))
     
-    
-    
-    def find_mid_block(self, ring_width):
-        for i in range(1, ring_width):
-            left_blocks = i;  # x ^ xx..xx where ^ is midpoint
-            blocks = left_blocks + 1;
-            right_blocks = ring_width - blocks; 
-            if left_blocks==right_blocks:
-                break;
-        return i+1;
-    
-    def draw_ring_large(self, column):
-        #mid_block = self.find_mid_block(LARGE_BLOCKS);
-        #left_blocks = mid_block - 1;
-        pass
+    def move(self, key1, key2):
+        #key1 is source
+        #key2 is destination
+        
+        
+        for pillar in self.pillars:
+            if key1 == self.pillars[pillar].label.lower():
+                source_pillar = self.pillars[pillar];
+            if key2 == self.pillars[pillar].label.lower():
+                dest_pillar = self.pillars[pillar];
+        
+        #crash when popping from empty list        
+        if len(source_pillar.rings) == 0:
+            return;
+                
+        source_ring = source_pillar.rings.pop(0);
+        is_legal = dest_pillar.check_legal_move(source_ring);
+        
+        if is_legal:
+            dest_pillar.rings.insert(0, source_ring)
+        else:
+            source_pillar.rings.insert(0, source_ring);
+                
+        print key1 + "," + key2
         
     
     
-    def draw_ring_medium(self, column):
-        pass;
-    
-    def draw_ring_small(self, column):
-        pass;

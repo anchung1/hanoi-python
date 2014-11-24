@@ -9,10 +9,13 @@ class Pillar(object):
         self.rings = [];
         if name=="left":
             self.column = 1;
+            self.label = "A"
         elif name=="middle":
             self.column = 2;
+            self.label = "B"
         else:
-            self.column = 3;    
+            self.column = 3;
+            self.label = "C"    
         
     def set_rings(self, ring):
         self.rings.append(ring)
@@ -25,6 +28,9 @@ class Pillar(object):
 
     def setPillarX(self, x):
         self.x = x;
+        
+    def setFont(self, text):
+        self.text = text;    
         
     
     

@@ -1,5 +1,6 @@
 import pygame
 from gameboard import Base
+from keyhandler import KeyHandler
 
 
 # Define some colors
@@ -26,6 +27,7 @@ done = False
 clock = pygame.time.Clock()
 
 board = Base(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+key = KeyHandler(board)
  
 # -------- Main Program Loop -----------
 while not done:
@@ -33,7 +35,20 @@ while not done:
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
             done = True # Flag that we are done so we exit this loop
- 
+            #print "done"
+        if event.type == pygame.KEYDOWN and event.key==pygame.K_a:
+            key.keyAdd("a")
+            #print "Key A pressed"
+        if event.type == pygame.KEYDOWN and event.key==pygame.K_b:
+            key.keyAdd("b")
+            #print "Key B pressed"
+        if event.type == pygame.KEYDOWN and event.key==pygame.K_c:
+            key.keyAdd("c")
+            #print "Key C pressed"
+        if event.type == pygame.KEYDOWN and event.key==pygame.K_SPACE:
+            key.keyClear()
+               
+                     
     # --- Game logic should go here
  
     # --- Drawing code should go here
@@ -41,10 +56,12 @@ while not done:
     # First, clear the screen to white. Don't put other drawing commands
     # above this, or they will be erased with this command.
     screen.fill(WHITE)
+    
+    
     board.draw_base();
-    board.draw_pillar(0);
-    board.draw_pillar(1);
-    board.draw_pillar(2);
+    board.draw_pillar("left");
+    board.draw_pillar("middle");
+    board.draw_pillar("right");
     
  
     # --- Go ahead and update the screen with what we've drawn.
